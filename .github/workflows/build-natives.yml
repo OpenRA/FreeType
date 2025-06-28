@@ -108,7 +108,7 @@ jobs:
         runs-on: ubuntu-22.04
         steps:
             - name: Setup dependencies and compile natives
-              uses: uraimo/run-on-arch-action@v2
+              uses: uraimo/run-on-arch-action@v3
               with:
                 arch: aarch64
                 distro: ubuntu22.04
