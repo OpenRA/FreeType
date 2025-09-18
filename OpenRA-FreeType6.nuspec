@@ -9,11 +9,11 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
     This is a version of FreeType patched and packaged for OpenRA.
-    The package includes the native binaries for FreeType 2.13.0.
+    The package includes the native binaries for FreeType 2.14.1.
     </description>
     <!-- Copyright claim taken from their GitHub repository. -->
     <copyright>
-    Copyright (C) 2013-2023 by David Turner, Robert Wilhelm, and Werner Lemberg
+    Copyright (C) 2013-2025 by David Turner, Robert Wilhelm, and Werner Lemberg
     </copyright>
     <license type="expression">FTL OR GPL-2.0-only</license>
     <tags>OpenRA natives FreeType</tags>

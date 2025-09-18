@@ -2,7 +2,7 @@ name: Build native dependencies (FreeType)
 
 # Change target FreeType version based on https://github.com/freetype/freetype/tags.
 env:
-    FREETYPE_VERSION: VER-2-13-0 # Make sure this matches the version mentioned in the description in the .nuspec file.
+    FREETYPE_VERSION: VER-2-14-1 # Make sure this matches the version mentioned in the description in the .nuspec file.
 
 on:
     pull_request:
@@ -50,7 +50,7 @@ jobs:
 
     macos:
         name: macOS (x64 + arm64)
-        runs-on: macos-12
+        runs-on: macos-13
         steps:
             - name: Setup Dependencies
               run: |
