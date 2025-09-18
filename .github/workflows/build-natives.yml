@@ -73,18 +73,21 @@ jobs:
                 name: Natives-MacOS
                 path: ./artifacts
 
-    # Note: Running inside a CentOS container because we want to compile using a version of glibc
+    # Note: Running inside a Rocky Linux container because we want to compile using a version of glibc
     # that is as old as reasonably possible to ensure backwards compatibility of the compiled binaries.
     linux-x64:
         name: Linux (x64)
         runs-on: ubuntu-22.04
-        container: centos:centos7
+        container: rockylinux:8
         steps:
             - name: Setup Dependencies
               run: |
                 mkdir -p artifacts/x64
-                yum -y install https://repo.ius.io/ius-release-el7.rpm centos-release-scl
-                yum -y install devtoolset-8 cmake3
+                dnf install -y "dnf-command(config-manager)"
+                dnf config-manager --set-enabled powertools
+                dnf install -y epel-release cmake
+                dnf groupinstall -y "Development Tools"
+                dnf -y update
 
             - name: Compile natives
               run: |
@@ -92,8 +95,8 @@ jobs:
                 unzip ${FREETYPE_VERSION}.zip
                 mkdir freetype-${FREETYPE_VERSION}/build
                 cd freetype-${FREETYPE_VERSION}/build
-                cmake3 .. -DBUILD_SHARED_LIBS=true -DCMAKE_BUILD_TYPE=Release -DFT_DISABLE_ZLIB=TRUE -DFT_DISABLE_BZIP2=TRUE -DFT_DISABLE_PNG=TRUE -DFT_DISABLE_HARFBUZZ=TRUE -DFT_DISABLE_BROTLI=TRUE
-                cmake3 --build .
+                cmake .. -DBUILD_SHARED_LIBS=true -DCMAKE_BUILD_TYPE=Release -DFT_DISABLE_ZLIB=TRUE -DFT_DISABLE_BZIP2=TRUE -DFT_DISABLE_PNG=TRUE -DFT_DISABLE_HARFBUZZ=TRUE -DFT_DISABLE_BROTLI=TRUE
+                cmake --build .
                 cp libfreetype.so ../../artifacts/x64/freetype6.so
 
             - name: Upload Artifacts
