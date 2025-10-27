@@ -73,7 +73,7 @@ jobs:
                 nuget pack OpenRA-FreeType6.nuspec -OutputDirectory ./nuget -version ${{ env.PACKAGE_VERSION }}
 
             - name: Upload NuGet package to Artifacts
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               with:
                 name: NuGet Package ${{ env.PACKAGE_VERSION }}
                 path: ./nuget
