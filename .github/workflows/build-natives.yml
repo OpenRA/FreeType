@@ -43,7 +43,7 @@ jobs:
                 cp libfreetype.dll ../../artifacts/x64/freetype6.dll
 
             - name: Upload Artifacts
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               with:
                 name: Natives-Windows
                 path: ./artifacts
@@ -68,7 +68,7 @@ jobs:
                 lipo -thin arm64 build/libfreetype.6.dylib -output ../artifacts/arm64/freetype6.dylib
 
             - name: Upload Artifacts
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               with:
                 name: Natives-MacOS
                 path: ./artifacts
@@ -100,7 +100,7 @@ jobs:
                 cp libfreetype.so ../../artifacts/x64/freetype6.so
 
             - name: Upload Artifacts
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               with:
                 name: Natives-Linux(x64)
                 path: ./artifacts
@@ -125,7 +125,7 @@ jobs:
                 cp libfreetype.so ../../artifacts/arm64/freetype6.so
 
             - name: Upload Artifacts
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               with:
                 name: Natives-Linux(arm64)
                 path: ./artifacts
