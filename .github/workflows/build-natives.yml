@@ -72,6 +72,49 @@ jobs:
                 name: Natives-Windows
                 path: ./artifacts
 
+    windows-arm64:
+        name: Windows (arm64)
+        runs-on: windows-11-arm
+        steps:
+            - name: Clone repository
+              uses: actions/checkout@v7
+
+            - name: Setup Dependencies
+              shell: pwsh
+              run: |
+                New-Item -ItemType Directory -Force -Path artifacts/arm64 | Out-Null
+
+            - name: Compile natives
+              shell: pwsh
+              run: |
+                $zip = "${env:FREETYPE_VERSION}.zip"
+                Invoke-WebRequest -Uri "https://github.com/freetype/freetype/archive/refs/tags/$zip" -OutFile $zip
+                Expand-Archive -Path $zip -DestinationPath .
+
+                $src = "freetype-${env:FREETYPE_VERSION}"
+                Push-Location $src
+                patch -p0 -i ..\win64.patch
+                Pop-Location
+
+                cmake -S $src -B "$src\build-arm64" `
+                  -A ARM64 `
+                  -DBUILD_SHARED_LIBS=TRUE `
+                  -DCMAKE_BUILD_TYPE=Release `
+                  -DFT_DISABLE_ZLIB=TRUE `
+                  -DFT_DISABLE_BZIP2=TRUE `
+                  -DFT_DISABLE_PNG=TRUE `
+                  -DFT_DISABLE_HARFBUZZ=TRUE `
+                  -DFT_DISABLE_BROTLI=TRUE
+
+                cmake --build "$src\build-arm64" --config Release
+                Copy-Item "$src\build-arm64\Release\freetype.dll" "artifacts\arm64\freetype6.dll" -Force
+
+            - name: Upload Artifacts
+              uses: actions/upload-artifact@v7
+              with:
+                name: Natives-Windows(arm64)
+                path: ./artifacts
+
     macos:
         name: macOS (x64 + arm64)
         runs-on: macos-14
