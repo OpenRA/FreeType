@@ -15,32 +15,56 @@ permissions:
 jobs:
     windows:
         name: Windows (x86 + x64)
-        runs-on: ubuntu-22.04
+        runs-on: windows-2022
         steps:
             - name: Clone repository
               uses: actions/checkout@v7
 
             - name: Setup Dependencies
+              shell: pwsh
               run: |
-                mkdir -p artifacts/x86
-                mkdir artifacts/x64
-                sudo apt-get install mingw-w64
+                New-Item -ItemType Directory -Force -Path artifacts/x86 | Out-Null
+                New-Item -ItemType Directory -Force -Path artifacts/x64 | Out-Null
 
             - name: Compile natives
+              shell: pwsh
               run: |
-                curl -s -L -O https://github.com/freetype/freetype/archive/refs/tags/${FREETYPE_VERSION}.zip
-                unzip ${FREETYPE_VERSION}.zip
-                mkdir freetype-${FREETYPE_VERSION}/build
-                cd freetype-${FREETYPE_VERSION}
-                patch -p0 < ../win64.patch
-                cd build
-                cmake .. -DCMAKE_TOOLCHAIN_FILE=../../mingw-x86.cmake -DBUILD_SHARED_LIBS=true -DCMAKE_BUILD_TYPE=Release -DFT_DISABLE_ZLIB=TRUE -DFT_DISABLE_BZIP2=TRUE -DFT_DISABLE_PNG=TRUE -DFT_DISABLE_HARFBUZZ=TRUE -DFT_DISABLE_BROTLI=TRUE -DCMAKE_SHARED_LINKER_FLAGS="-static-libgcc"
-                cmake --build .
-                cp libfreetype.dll ../../artifacts/x86/freetype6.dll
-                rm -rf *
-                cmake .. -DCMAKE_TOOLCHAIN_FILE=../../mingw-x64.cmake -DBUILD_SHARED_LIBS=true -DCMAKE_BUILD_TYPE=Release -DFT_DISABLE_ZLIB=TRUE -DFT_DISABLE_BZIP2=TRUE -DFT_DISABLE_PNG=TRUE -DFT_DISABLE_HARFBUZZ=TRUE -DFT_DISABLE_BROTLI=TRUE
-                cmake --build .
-                cp libfreetype.dll ../../artifacts/x64/freetype6.dll
+                $zip = "${env:FREETYPE_VERSION}.zip"
+                Invoke-WebRequest -Uri "https://github.com/freetype/freetype/archive/refs/tags/$zip" -OutFile $zip
+                Expand-Archive -Path $zip -DestinationPath .
+
+                $src = "freetype-${env:FREETYPE_VERSION}"
+                Push-Location $src
+                patch -p0 -i ..\win64.patch
+                Pop-Location
+
+                # x86 build
+                cmake -S $src -B "$src\build-x86" `
+                  -A Win32 `
+                  -DBUILD_SHARED_LIBS=TRUE `
+                  -DCMAKE_BUILD_TYPE=Release `
+                  -DFT_DISABLE_ZLIB=TRUE `
+                  -DFT_DISABLE_BZIP2=TRUE `
+                  -DFT_DISABLE_PNG=TRUE `
+                  -DFT_DISABLE_HARFBUZZ=TRUE `
+                  -DFT_DISABLE_BROTLI=TRUE
+
+                cmake --build "$src\build-x86" --config Release
+                Copy-Item "$src\build-x86\Release\freetype.dll" "artifacts\x86\freetype6.dll" -Force
+
+                # x64 build
+                cmake -S $src -B "$src\build-x64" `
+                  -A x64 `
+                  -DBUILD_SHARED_LIBS=TRUE `
+                  -DCMAKE_BUILD_TYPE=Release `
+                  -DFT_DISABLE_ZLIB=TRUE `
+                  -DFT_DISABLE_BZIP2=TRUE `
+                  -DFT_DISABLE_PNG=TRUE `
+                  -DFT_DISABLE_HARFBUZZ=TRUE `
+                  -DFT_DISABLE_BROTLI=TRUE
+
+                cmake --build "$src\build-x64" --config Release
+                Copy-Item "$src\build-x64\Release\freetype.dll" "artifacts\x64\freetype6.dll" -Force
 
             - name: Upload Artifacts
               uses: actions/upload-artifact@v7
