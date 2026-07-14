@@ -11,6 +11,11 @@
       <Link>freetype6.dll</Link>
       <Visible>false</Visible>
     </Content>
+    <Content Include="$(MSBuildThisFileDirectory)\..\native\win-arm64\freetype6.dll" Condition="'$(TargetPlatform)' == 'win-arm64'">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>freetype6.dll</Link>
+      <Visible>false</Visible>
+    </Content>
     <Content Include="$(MSBuildThisFileDirectory)\..\native\linux-x64\freetype6.so" Condition="'$(TargetPlatform)' == 'linux-x64'">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>freetype6.so</Link>
