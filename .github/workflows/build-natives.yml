@@ -14,7 +14,7 @@ permissions:
 
 jobs:
     windows:
-        name: Windows (x86 + x64)
+        name: Windows (x64)
         runs-on: windows-2022
         steps:
             - name: Clone repository
@@ -23,7 +23,6 @@ jobs:
             - name: Setup Dependencies
               shell: pwsh
               run: |
-                New-Item -ItemType Directory -Force -Path artifacts/x86 | Out-Null
                 New-Item -ItemType Directory -Force -Path artifacts/x64 | Out-Null
 
             - name: Compile natives
@@ -38,21 +37,6 @@ jobs:
                 patch -p0 -i ..\win64.patch
                 Pop-Location
 
-                # x86 build
-                cmake -S $src -B "$src\build-x86" `
-                  -A Win32 `
-                  -DBUILD_SHARED_LIBS=TRUE `
-                  -DCMAKE_BUILD_TYPE=Release `
-                  -DFT_DISABLE_ZLIB=TRUE `
-                  -DFT_DISABLE_BZIP2=TRUE `
-                  -DFT_DISABLE_PNG=TRUE `
-                  -DFT_DISABLE_HARFBUZZ=TRUE `
-                  -DFT_DISABLE_BROTLI=TRUE
-
-                cmake --build "$src\build-x86" --config Release
-                Copy-Item "$src\build-x86\Release\freetype.dll" "artifacts\x86\freetype6.dll" -Force
-
-                # x64 build
                 cmake -S $src -B "$src\build-x64" `
                   -A x64 `
                   -DBUILD_SHARED_LIBS=TRUE `
